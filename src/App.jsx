@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiX, FiArrowUp, FiMessageSquare, FiGithub, FiLinkedin, FiMail, FiExternalLink, FiArrowRight, FiMapPin, FiDownload } from 'react-icons/fi';
+import { FiX, FiArrowUp, FiMessageSquare, FiGithub, FiLinkedin, FiMail, FiExternalLink, FiArrowRight, FiMapPin, FiDownload, FiSend } from 'react-icons/fi';
 import { SiKaggle } from 'react-icons/si';
 
 const DEBUG_MODE = false; 
@@ -45,7 +45,6 @@ const PROJECTS_DATA = [
   }
 ];
 
-// --- 🎨 THEME ENGINE ---
 const THEME_CONFIG = {
   morning: {
     navRgb: '186, 230, 253', 
@@ -115,14 +114,15 @@ const THEME_CONFIG = {
 const CHAT_OPTIONS = [
   { id: 1, question: "Tell me about yourself.", answer: "I'm Brintik, a full-stack engineer bridging the gap between machine learning backends and premium front-end experiences." },
   { id: 2, question: "What is your main tech stack?", answer: "React, Tailwind, and Framer Motion on the frontend. Python, FastAPI, Docker, and custom YOLOv8 Neural Networks on the backend!" },
-  { id: 3, question: "Are you open to new work?", answer: "Yes! I'm currently looking for full-time roles and open to exciting freelance projects. Feel free to use the contact form at the bottom of the page." },
-  { id: 4, question: "What's your favorite project here?", answer: "Definitely the AI Image Recognizer. Building a decoupled architecture that seamlessly connects an ML brain to a React UI was an incredible challenge." }
+  { id: 3, question: "Are you open to new work?", answer: "Yes! I'm currently looking for full-time roles and open to exciting freelance projects. Feel free to use the contact form at the bottom of the page." }
 ];
 
 export default function Portfolio() {
   const [timeOfDay, setTimeOfDay] = useState('afternoon');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatHistory, setChatHistory] = useState([{ type: 'npc', text: "Hey there. Thanks for dropping by. What do you want to know?" }]);
+  const [customInput, setCustomInput] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef(null);
 
   useEffect(() => {
@@ -134,11 +134,6 @@ export default function Portfolio() {
 
   useEffect(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), [chatHistory]);
 
-  const handleAskQuestion = (qa) => {
-    setChatHistory(prev => [...prev, { type: 'player', text: qa.question }]);
-    setTimeout(() => setChatHistory(prev => [...prev, { type: 'npc', text: qa.answer }]), 600);
-  };
-
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
   
   const scrollToSection = (id) => {
@@ -146,6 +141,57 @@ export default function Portfolio() {
     if (element) {
       const y = element.getBoundingClientRect().top + window.scrollY - 80;
       window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  };
+
+  // Pre-set Button Logic
+  const handleAskQuestion = (qa) => {
+    if (isTyping) return;
+    setChatHistory(prev => [...prev, { type: 'player', text: qa.question }]);
+    setIsTyping(true);
+    setTimeout(() => {
+      setChatHistory(prev => [...prev, { type: 'npc', text: qa.answer }]);
+      setIsTyping(false);
+    }, 600);
+  };
+
+  // LLM API Call Logic
+  const handleCustomSubmit = async (e) => {
+    e.preventDefault();
+    if (!customInput.trim() || isTyping) return;
+
+    const userMessage = customInput.trim();
+    setChatHistory(prev => [...prev, { type: 'player', text: userMessage }]);
+    setCustomInput('');
+    setIsTyping(true);
+
+    try {
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'llama3-8b-8192', // Blazing fast model
+          messages: [
+            { 
+              role: 'system', 
+              content: "You are Brintik, a Full-Stack AI Engineer. You are chatting with a recruiter/visitor on your portfolio site. Keep answers under 3 sentences, confident, and professional. Your stack includes React, Tailwind, Python, FastAPI, Docker, and YOLOv8. If asked something irrelevant, politely redirect the conversation back to your development skills." 
+            },
+            { role: 'user', content: userMessage }
+          ]
+        })
+      });
+
+      const data = await response.json();
+      const aiResponse = data.choices[0].message.content;
+      
+      setChatHistory(prev => [...prev, { type: 'npc', text: aiResponse }]);
+    } catch (error) {
+      setChatHistory(prev => [...prev, { type: 'npc', text: "Looks like my API connection is taking a nap. Feel free to use the email form at the bottom of the page!" }]);
+    } finally {
+      setIsTyping(false);
     }
   };
 
@@ -184,8 +230,6 @@ export default function Portfolio() {
         <img src={`/${timeOfDay}.png`} alt="Cozy Anime Room" className="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 z-0" />
 
         <div className="absolute inset-0 z-10 pt-16">
-          
-          {/* --- CHARACTER HOTSPOT & MANGA CHAT BUBBLE --- */}
           <div 
             onClick={() => setIsChatOpen(true)}
             className={`absolute cursor-pointer group ${DEBUG_MODE ? 'bg-red-500/50 border-2 border-red-500' : ''}`}
@@ -205,7 +249,6 @@ export default function Portfolio() {
             )}
           </div>
 
-          {/* --- SCI-FI TARGETER SHELF OBJECTS --- */}
           {SHELF_PROJECTS.map((project) => (
             <div 
               key={project.id}
@@ -213,17 +256,13 @@ export default function Portfolio() {
               className="absolute cursor-pointer group flex items-center justify-center"
               style={{ top: project.top, left: project.left, width: project.width, height: project.height }}
             >
-              {/* Animated Corner Brackets */}
               <div className="absolute w-full h-full group-hover:scale-90 transition-transform duration-300 ease-out">
-                <div className="absolute top-0 left-0 w-4 h-4 border-t-[3.5px] border-l-[3.5px] border-white/50 group-hover:border-green-400 transition-colors" />
-                <div className="absolute top-0 right-0 w-4 h-4 border-t-[3.5px] border-r-[3.5px] border-white/50 group-hover:border-green-400 transition-colors" />
-                <div className="absolute bottom-0 left-0 w-4 h-4 border-b-[3.5px] border-l-[3.5px] border-white/50 group-hover:border-green-400 transition-colors" />
-                <div className="absolute bottom-0 right-0 w-4 h-4 border-b-[3.5px] border-r-[3.5px] border-white/50 group-hover:border-green-400 transition-colors" />
+                <div className="absolute top-0 left-0 w-2 h-2 border-t-[1.5px] border-l-[1.5px] border-white/50 group-hover:border-green-400 transition-colors" />
+                <div className="absolute top-0 right-0 w-2 h-2 border-t-[1.5px] border-r-[1.5px] border-white/50 group-hover:border-green-400 transition-colors" />
+                <div className="absolute bottom-0 left-0 w-2 h-2 border-b-[1.5px] border-l-[1.5px] border-white/50 group-hover:border-green-400 transition-colors" />
+                <div className="absolute bottom-0 right-0 w-2 h-2 border-b-[1.5px] border-r-[1.5px] border-white/50 group-hover:border-green-400 transition-colors" />
               </div>
-
-              {/* Center crosshair */}
               <div className="absolute w-1 h-1 bg-green-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              
               <motion.div initial={{ opacity: 0, y: 10 }} whileHover={{ opacity: 1, y: 0 }}
                 className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white font-bold text-xs px-3 py-1.5 rounded-md shadow-xl whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-20 border border-slate-700"
               >
@@ -296,11 +335,9 @@ export default function Portfolio() {
       {/* --- 6. CONTACT & FOOTER SECTION --- */}
       <footer id="contact" className={`${currentTheme.footerBg} border-t ${currentTheme.cardBorder} py-24 mt-12 transition-colors duration-1000`}>
         <div className="max-w-4xl mx-auto px-6 flex flex-col md:flex-row gap-16">
-          
           <div className="w-full md:w-1/2 flex flex-col">
             <h2 className={`text-3xl font-bold mb-6 ${currentTheme.textMain}`}>Let's Connect.</h2>
             <p className={`mb-8 ${currentTheme.textMuted}`}>Currently open for new opportunities. Whether you have a question or just want to say hi, I'll try my best to get back to you!</p>
-            
             <div className="flex flex-col gap-4 mb-8">
               <a href="mailto:brintikmajumder@gmail.com" className={`flex items-center gap-4 hover:text-green-500 transition w-fit ${currentTheme.textMuted}`}>
                 <FiMail className="text-xl" /> brintikmajumder@gmail.com
@@ -309,14 +346,12 @@ export default function Portfolio() {
                 <FiMapPin className="text-xl text-green-500" /> West Bengal, India
               </div>
             </div>
-
             <div className="flex gap-4 mt-auto">
               <a href="https://github.com/Brintik" target="_blank" rel="noreferrer" className={`p-3 ${currentTheme.inputBg} border ${currentTheme.cardBorder} hover:border-green-400 ${currentTheme.textMain} rounded-lg transition`}><FiGithub size={20} /></a>
               <a href="https://www.linkedin.com/in/brintikmajumder/" target="_blank" rel="noreferrer" className={`p-3 ${currentTheme.inputBg} border ${currentTheme.cardBorder} hover:border-green-400 ${currentTheme.textMain} rounded-lg transition`}><FiLinkedin size={20} /></a>
               <a href="https://www.kaggle.com/brintikmajumder" target="_blank" rel="noreferrer" className={`p-3 ${currentTheme.inputBg} border ${currentTheme.cardBorder} hover:border-green-400 ${currentTheme.textMain} rounded-lg transition`}><SiKaggle size={20} /></a>
             </div>
           </div>
-
           <div className="w-full md:w-1/2">
             <form action="https://formspree.io/f/YOUR_FORM_ID_HERE" method="POST" className="flex flex-col gap-4">
               <input type="text" name="name" required placeholder="Your Name" className={`w-full p-4 rounded-xl ${currentTheme.inputBg} border ${currentTheme.inputBorder} ${currentTheme.textMain} focus:outline-none focus:border-green-500 transition-colors`} />
@@ -328,12 +363,12 @@ export default function Portfolio() {
         </div>
       </footer>
 
-      {/* --- DYNAMIC THEME CHATBOX OVERLAY --- */}
+      {/* --- DYNAMIC THEME HYBRID CHATBOX --- */}
       <AnimatePresence>
         {isChatOpen && (
           <motion.div 
             initial={{ opacity: 0, y: 50, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className={`fixed bottom-8 right-8 w-96 h-[500px] ${currentTheme.chatBg} backdrop-blur-xl border ${currentTheme.chatBorder} rounded-2xl shadow-2xl flex flex-col overflow-hidden z-[100] transition-colors duration-500`}
+            className={`fixed bottom-8 right-8 w-96 h-[550px] ${currentTheme.chatBg} backdrop-blur-xl border ${currentTheme.chatBorder} rounded-2xl shadow-2xl flex flex-col overflow-hidden z-[100] transition-colors duration-500`}
           >
             <div className={`flex justify-between items-center p-4 border-b ${currentTheme.chatBorder} ${currentTheme.chatHeaderBg}`}>
               <div className="flex items-center">
@@ -351,15 +386,53 @@ export default function Portfolio() {
                   </div>
                 </div>
               ))}
+              {isTyping && (
+                <div className="flex justify-start">
+                  <div className={`p-3 rounded-2xl text-sm ${currentTheme.npcMsgBg} border ${currentTheme.npcMsgBorder} ${currentTheme.npcMsgText} rounded-bl-sm shadow-sm flex gap-1 items-center`}>
+                    <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></div>
+                    <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-75"></div>
+                    <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-150"></div>
+                  </div>
+                </div>
+              )}
               <div ref={chatEndRef} />
             </div>
             
-            <div className={`p-3 ${currentTheme.chatHeaderBg} border-t ${currentTheme.chatBorder} space-y-2`}>
-              {CHAT_OPTIONS.map((opt) => (
-                <button key={opt.id} onClick={() => handleAskQuestion(opt)} className={`w-full text-left p-2 rounded-lg border ${currentTheme.chatBorder} ${currentTheme.chatBtnBg} ${currentTheme.chatTextMain} text-sm ${currentTheme.chatBtnHover} transition cursor-pointer shadow-sm`}>
-                  {opt.question}
+            {/* Quick Replies & Custom Input */}
+            <div className={`p-3 ${currentTheme.chatHeaderBg} border-t ${currentTheme.chatBorder} flex flex-col gap-3`}>
+              
+              {/* Scrollable Quick Reply Chips */}
+              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                {CHAT_OPTIONS.map((opt) => (
+                  <button 
+                    key={opt.id} 
+                    onClick={() => handleAskQuestion(opt)} 
+                    disabled={isTyping}
+                    className={`whitespace-nowrap px-3 py-1.5 rounded-full border ${currentTheme.chatBorder} ${currentTheme.chatBtnBg} ${currentTheme.chatTextMain} text-xs ${currentTheme.chatBtnHover} transition cursor-pointer shadow-sm disabled:opacity-50`}
+                  >
+                    {opt.question}
+                  </button>
+                ))}
+              </div>
+
+              {/* Dynamic Text Input */}
+              <form onSubmit={handleCustomSubmit} className="flex gap-2">
+                <input 
+                  type="text" 
+                  value={customInput} 
+                  onChange={(e) => setCustomInput(e.target.value)} 
+                  disabled={isTyping}
+                  placeholder="Ask me anything..." 
+                  className={`flex-1 px-3 py-2 rounded-lg text-sm bg-white/50 border ${currentTheme.inputBorder} ${currentTheme.textMain} focus:outline-none focus:border-green-500 transition disabled:opacity-50`}
+                />
+                <button 
+                  type="submit" 
+                  disabled={isTyping || !customInput.trim()} 
+                  className="bg-green-500 hover:bg-green-400 text-white p-2 rounded-lg transition disabled:opacity-50 disabled:bg-green-500/50 flex items-center justify-center"
+                >
+                  <FiSend size={16} />
                 </button>
-              ))}
+              </form>
             </div>
           </motion.div>
         )}
