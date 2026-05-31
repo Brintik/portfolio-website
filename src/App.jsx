@@ -3,6 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiX, FiArrowUp, FiGithub, FiLinkedin, FiMail, FiExternalLink, FiArrowRight, FiMapPin, FiDownload, FiSend } from 'react-icons/fi';
 import { SiKaggle } from 'react-icons/si';
 
+// IMPORT YOUR NEW DATA FILE HERE
+import { SITE_DATA } from './portfolioData';
+
 const DEBUG_MODE = false; 
 
 const CHARACTER_POSITIONS = {
@@ -17,7 +20,6 @@ const SHELF_PROJECTS = [
   { id: 13, name: "Plant Pot App", top: '25%', left: '27.5%', width: '5%', height: '12%', targetId: 'project-13' },
 ];
 
-// UPDATED: Sliding panel backgrounds set to 50% opacity (/50)
 const THEME_CONFIG = {
   morning: { navRgb: '186, 230, 253', pageBg: 'bg-slate-50/50', textMain: 'text-slate-900', textMuted: 'text-slate-700', cardBg: 'bg-white', cardBorder: 'border-slate-200', footerBg: 'bg-slate-100', inputBg: 'bg-white', inputBorder: 'border-slate-300', chatBg: 'bg-sky-50/95', chatHeaderBg: 'bg-sky-100/90', chatBorder: 'border-sky-200', chatTextMain: 'text-slate-900', npcMsgBg: 'bg-white', npcMsgBorder: 'border-sky-200', npcMsgText: 'text-slate-800' },
   afternoon: { navRgb: '255, 237, 213', pageBg: 'bg-slate-50/50', textMain: 'text-slate-900', textMuted: 'text-slate-700', cardBg: 'bg-white', cardBorder: 'border-slate-200', footerBg: 'bg-slate-100', inputBg: 'bg-white', inputBorder: 'border-slate-300', chatBg: 'bg-orange-50/95', chatHeaderBg: 'bg-orange-100/90', chatBorder: 'border-orange-200', chatTextMain: 'text-slate-900', npcMsgBg: 'bg-white', npcMsgBorder: 'border-orange-200', npcMsgText: 'text-slate-800' },
@@ -33,7 +35,6 @@ const CHAT_OPTIONS = [
 export default function Portfolio() {
   const [timeOfDay, setTimeOfDay] = useState('afternoon');
   const [bgLoaded, setBgLoaded] = useState(false);
-  const [siteData, setSiteData] = useState(null);
   
   // Chat State
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -44,13 +45,6 @@ export default function Portfolio() {
   
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
-
-  useEffect(() => {
-    fetch('/data/portfolio.json')
-      .then(res => res.json())
-      .then(data => setSiteData(data))
-      .catch(err => console.error("Error loading site data:", err));
-  }, []);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -118,14 +112,11 @@ export default function Portfolio() {
     }
   };
 
-  if (!siteData) return <div className="h-screen w-screen bg-slate-950 flex items-center justify-center text-white font-mono">Loading Neural Architecture...</div>;
-
   const currentTheme = THEME_CONFIG[timeOfDay];
 
   return (
     <div className={`relative w-full min-h-screen font-sans selection:bg-green-500 selection:text-white`}>
       
-      {/* 1. FIXED NAV BAR - UPDATED to 60% opacity (0.6) */}
       <nav className="fixed top-0 left-0 w-full h-16 z-[70] flex items-center justify-between px-8 backdrop-blur-md transition-colors duration-500 border-b border-transparent" style={{ backgroundColor: `rgba(${currentTheme.navRgb}, 0.6)` }}>
         <div className={`font-black text-xl tracking-tighter text-white cursor-pointer`} onClick={scrollToTop}>
           BRINTIK<span className="opacity-50">.dev</span>
@@ -135,18 +126,13 @@ export default function Portfolio() {
           <button onClick={() => scrollToSection('resume')} className="hover:text-green-400 transition">Resume</button>
           <button onClick={() => scrollToSection('projects')} className="hover:text-green-400 transition">Projects</button>
           <div className="h-4 w-px bg-white opacity-30"></div> 
-          
-          <a href={siteData.links.github} target="_blank" rel="noreferrer" className="hover:text-green-400 transition flex items-center gap-2"><FiGithub size={16}/> GitHub</a>
-          <a href={siteData.links.linkedin} target="_blank" rel="noreferrer" className="hover:text-green-400 transition flex items-center gap-2"><FiLinkedin size={16}/> LinkedIn</a>
-          
-          {/* RESTORED KAGGLE LINK */}
-          <a href={siteData.links.kaggle} target="_blank" rel="noreferrer" className="hover:text-green-400 transition flex items-center gap-2"><SiKaggle size={16}/> Kaggle</a>
-          
+          <a href={SITE_DATA.links.github} target="_blank" rel="noreferrer" className="hover:text-green-400 transition flex items-center gap-2"><FiGithub size={16}/> GitHub</a>
+          <a href={SITE_DATA.links.linkedin} target="_blank" rel="noreferrer" className="hover:text-green-400 transition flex items-center gap-2"><FiLinkedin size={16}/> LinkedIn</a>
+          <a href={SITE_DATA.links.kaggle} target="_blank" rel="noreferrer" className="hover:text-green-400 transition flex items-center gap-2"><SiKaggle size={16}/> Kaggle</a>
           <button onClick={() => scrollToSection('contact')} className="hover:text-green-400 transition flex items-center gap-2"><FiMail size={16}/> Contact</button>
         </div>
       </nav>
 
-      {/* 2. FIXED BACKGROUND & HERO HOTSPOTS */}
       <div className="fixed inset-0 w-full h-full z-0 bg-slate-900">
         <motion.img 
           src={`/${timeOfDay}.png`} 
@@ -160,7 +146,6 @@ export default function Portfolio() {
         
         {bgLoaded && (
           <div className="absolute inset-0 pt-16 z-10">
-            {/* CHARACTER HOTSPOT */}
             <div onClick={() => setIsChatOpen(true)} className={`absolute cursor-pointer group ${DEBUG_MODE ? 'bg-red-500/50' : ''}`} style={CHARACTER_POSITIONS[timeOfDay]}>
               {!isChatOpen && (
                 <motion.div onClick={(e) => { e.stopPropagation(); setIsChatOpen(true); }} animate={{ y: [0, -8, 0] }} transition={{ repeat: Infinity, duration: 2.5 }} className="absolute -top-16 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm text-slate-900 font-extrabold text-sm px-4 py-2 rounded-2xl border-2 border-slate-900 shadow-[4px_4px_0_0_rgba(15,23,42,1)] hover:scale-110 transition-transform whitespace-nowrap pointer-events-auto">
@@ -170,14 +155,13 @@ export default function Portfolio() {
               )}
             </div>
 
-            {/* SHELF SCI-FI TARGETERS */}
             {SHELF_PROJECTS.map((project) => (
               <div key={project.id} onClick={() => scrollToSection(project.targetId)} className={`absolute cursor-pointer group flex items-center justify-center ${DEBUG_MODE ? 'bg-blue-500/50' : ''}`} style={{ top: project.top, left: project.left, width: project.width, height: project.height }}>
                 <div className="absolute w-full h-full group-hover:scale-90 transition-transform duration-300">
-                  <div className="absolute top-0 left-0 w-4 h-4 border-t-[3.5px] border-l-[3.5px] border-white/50 group-hover:border-green-400" />
-                  <div className="absolute top-0 right-0 w-4 h-4 border-t-[3.5px] border-r-[3.5px] border-white/50 group-hover:border-green-400" />
-                  <div className="absolute bottom-0 left-0 w-4 h-4 border-b-[3.5px] border-l-[3.5px] border-white/50 group-hover:border-green-400" />
-                  <div className="absolute bottom-0 right-0 w-4 h-4 border-b-[3.5px] border-r-[3.5px] border-white/50 group-hover:border-green-400" />
+                  <div className="absolute top-0 left-0 w-4 h-4 border-t-[3px] border-l-[3px] border-white/50 group-hover:border-green-400" />
+                  <div className="absolute top-0 right-0 w-4 h-4 border-t-[3px] border-r-[3px] border-white/50 group-hover:border-green-400" />
+                  <div className="absolute bottom-0 left-0 w-4 h-4 border-b-[3px] border-l-[3px] border-white/50 group-hover:border-green-400" />
+                  <div className="absolute bottom-0 right-0 w-4 h-4 border-b-[3px] border-r-[3px] border-white/50 group-hover:border-green-400" />
                 </div>
                 <motion.div initial={{ opacity: 0, y: 10 }} whileHover={{ opacity: 1, y: 0 }} className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white font-bold text-xs px-3 py-1.5 rounded-md whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 z-20 border border-slate-700">
                   {project.name}
@@ -188,7 +172,6 @@ export default function Portfolio() {
         )}
       </div>
 
-      {/* 3. SCROLLING CONTENT LAYER (50% Transparent via Theme config) */}
       <div className="relative z-10 w-full flex flex-col pointer-events-none">
         <div className="w-full h-screen"></div>
         
@@ -197,7 +180,8 @@ export default function Portfolio() {
           <section id="about" className="py-32 px-6 max-w-4xl mx-auto text-center md:text-left">
             <h2 className={`text-4xl font-extrabold mb-6 ${currentTheme.textMain}`}>About <span className="text-green-500">Me</span></h2>
             <div className="h-1 w-20 bg-green-500 rounded-full mb-10 mx-auto md:mx-0"></div>
-            <p className={`text-xl leading-relaxed font-medium ${currentTheme.textMuted}`}>{siteData.aboutMe}</p>
+            {/* Added whitespace-pre-line so it renders your paragraphs correctly! */}
+            <p className={`text-xl leading-relaxed font-medium whitespace-pre-line ${currentTheme.textMuted}`}>{SITE_DATA.aboutMe}</p>
           </section>
 
           <section id="resume" className="py-12 px-6 max-w-4xl mx-auto">
@@ -206,7 +190,7 @@ export default function Portfolio() {
                 <h2 className={`text-3xl font-extrabold mb-2 ${currentTheme.textMain}`}>Brintik Majumder</h2>
                 <p className="text-green-500 font-mono font-bold">Full-Stack Software Engineer</p>
               </div>
-              <a href={siteData.links.resume} target="_blank" rel="noopener noreferrer" className="mt-6 md:mt-0 flex items-center gap-3 px-8 py-4 bg-green-500 hover:bg-green-400 text-white font-extrabold rounded-xl transition-all shadow-lg hover:-translate-y-1">
+              <a href={SITE_DATA.links.resume} target="_blank" rel="noopener noreferrer" className="mt-6 md:mt-0 flex items-center gap-3 px-8 py-4 bg-green-500 hover:bg-green-400 text-white font-extrabold rounded-xl transition-all shadow-lg hover:-translate-y-1">
                 <FiDownload size={20} /> View Full Resume
               </a>
             </div>
@@ -215,16 +199,28 @@ export default function Portfolio() {
           <section id="projects" className="py-24 px-6 max-w-5xl mx-auto">
             <h2 className={`text-4xl font-extrabold mb-6 ${currentTheme.textMain}`}>Selected <span className="text-green-500">Works</span></h2>
             <div className="space-y-16 mt-16">
-              {siteData.projects.map((proj) => (
+              {SITE_DATA.projects.map((proj) => (
                 <div key={proj.id} id={proj.id} onClick={() => window.location.href = proj.readMoreUrl} className={`group flex flex-col md:flex-row ${currentTheme.cardBg} border ${currentTheme.cardBorder} rounded-2xl overflow-hidden hover:border-green-500 transition-all cursor-pointer shadow-xl`}>
                   <div className="w-full md:w-5/12 h-64 md:h-auto relative overflow-hidden bg-slate-900">
                     <img src={proj.image} alt={proj.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100" />
                   </div>
                   <div className="w-full md:w-7/12 p-8 md:p-12 flex flex-col justify-center">
                     <h3 className={`text-3xl font-bold mb-4 group-hover:text-green-500 transition-colors ${currentTheme.textMain}`}>{proj.title}</h3>
-                    <p className={`leading-relaxed mb-8 ${currentTheme.textMuted}`}>{proj.shortDesc}</p>
                     
-                    {/* RESTORED: Read Case Study Button */}
+                    {/* Added whitespace-pre-line so it renders your paragraphs correctly! */}
+                    <p className={`leading-relaxed mb-6 whitespace-pre-line ${currentTheme.textMuted}`}>{proj.shortDesc}</p>
+                    
+                    {/* NEW TAGS SECTION */}
+                    {proj.tags && (
+                      <div className="flex flex-wrap gap-2 mb-8">
+                        {proj.tags.map((tag, i) => (
+                          <span key={i} className={`px-3 py-1 text-xs font-bold rounded-md bg-green-500/10 text-green-600 border border-green-500/20`}>
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    
                     <div className="flex items-center gap-6 mt-auto">
                       <a href={proj.websiteUrl} onClick={(e) => e.stopPropagation()} target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg border ${currentTheme.cardBorder} hover:border-green-500 text-green-500 transition`}>
                         <FiExternalLink /> Live Site
@@ -233,7 +229,6 @@ export default function Portfolio() {
                         Read Case Study <FiArrowRight />
                       </span>
                     </div>
-
                   </div>
                 </div>
               ))}
@@ -248,8 +243,8 @@ export default function Portfolio() {
                 <p className={`mb-8 ${currentTheme.textMuted}`}>Currently open for new opportunities. Whether you have a question or just want to say hi, I'll try my best to get back to you!</p>
                 
                 <div className="flex flex-col gap-4 mb-8">
-                  <a href={`mailto:${siteData.links.email}`} className={`flex items-center gap-4 hover:text-green-500 transition w-fit ${currentTheme.textMuted}`}>
-                    <FiMail className="text-xl" /> {siteData.links.email}
+                  <a href={`mailto:${SITE_DATA.links.email}`} className={`flex items-center gap-4 hover:text-green-500 transition w-fit ${currentTheme.textMuted}`}>
+                    <FiMail className="text-xl" /> {SITE_DATA.links.email}
                   </a>
                   <div className={`flex items-center gap-4 ${currentTheme.textMuted}`}>
                     <FiMapPin className="text-xl text-green-500" /> West Bengal, India
@@ -257,14 +252,14 @@ export default function Portfolio() {
                 </div>
 
                 <div className="flex gap-4 mt-auto">
-                  <a href={siteData.links.github} target="_blank" rel="noreferrer" className={`p-3 ${currentTheme.inputBg} border ${currentTheme.cardBorder} hover:border-green-400 ${currentTheme.textMain} rounded-lg transition`}><FiGithub size={20} /></a>
-                  <a href={siteData.links.linkedin} target="_blank" rel="noreferrer" className={`p-3 ${currentTheme.inputBg} border ${currentTheme.cardBorder} hover:border-green-400 ${currentTheme.textMain} rounded-lg transition`}><FiLinkedin size={20} /></a>
-                  <a href={siteData.links.kaggle} target="_blank" rel="noreferrer" className={`p-3 ${currentTheme.inputBg} border ${currentTheme.cardBorder} hover:border-green-400 ${currentTheme.textMain} rounded-lg transition`}><SiKaggle size={20} /></a>
+                  <a href={SITE_DATA.links.github} target="_blank" rel="noreferrer" className={`p-3 ${currentTheme.inputBg} border ${currentTheme.cardBorder} hover:border-green-400 ${currentTheme.textMain} rounded-lg transition`}><FiGithub size={20} /></a>
+                  <a href={SITE_DATA.links.linkedin} target="_blank" rel="noreferrer" className={`p-3 ${currentTheme.inputBg} border ${currentTheme.cardBorder} hover:border-green-400 ${currentTheme.textMain} rounded-lg transition`}><FiLinkedin size={20} /></a>
+                  <a href={SITE_DATA.links.kaggle} target="_blank" rel="noreferrer" className={`p-3 ${currentTheme.inputBg} border ${currentTheme.cardBorder} hover:border-green-400 ${currentTheme.textMain} rounded-lg transition`}><SiKaggle size={20} /></a>
                 </div>
               </div>
 
               <div className="w-full md:w-1/2">
-                <form action="https://formspree.io/f/YOUR_FORM_ID_HERE" method="POST" className="flex flex-col gap-4">
+                <form action="https://formspree.io/f/mbdbenyl" method="POST" className="flex flex-col gap-4">
                   <input type="text" name="name" required placeholder="Your Name" className={`w-full p-4 rounded-xl ${currentTheme.inputBg} border ${currentTheme.inputBorder} ${currentTheme.textMain} focus:outline-none focus:border-green-500 transition-colors`} />
                   <input type="email" name="email" required placeholder="Your Email Address" className={`w-full p-4 rounded-xl ${currentTheme.inputBg} border ${currentTheme.inputBorder} ${currentTheme.textMain} focus:outline-none focus:border-green-500 transition-colors`} />
                   <textarea name="message" required rows="4" placeholder="Your Message" className={`w-full p-4 rounded-xl ${currentTheme.inputBg} border ${currentTheme.inputBorder} ${currentTheme.textMain} focus:outline-none focus:border-green-500 transition-colors resize-none`}></textarea>
