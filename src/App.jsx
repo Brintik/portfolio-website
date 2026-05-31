@@ -166,6 +166,13 @@ export default function Portfolio() {
     setIsTyping(true);
 
     try {
+      // 1. Format previous chat history for the LLM
+      const apiHistory = chatHistory.map(msg => ({
+        role: msg.type === 'player' ? 'user' : 'assistant',
+        content: msg.text
+      }));
+
+      // 2. Send System Prompt + History + New Message
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -173,12 +180,13 @@ export default function Portfolio() {
           'Authorization': `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`
         },
         body: JSON.stringify({
-          model: 'llama-3.1-8b-instant', // Blazing fast model
+          model: 'llama-3.1-8b-instant', 
           messages: [
             { 
               role: 'system', 
-              content: import.meta.env.VITE_AI_LORE
+              content: import.meta.env.VITE_AI_LORE 
             },
+            ...apiHistory, // Injecting the memory!
             { role: 'user', content: userMessage }
           ]
         })
