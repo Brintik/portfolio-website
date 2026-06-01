@@ -38,15 +38,15 @@ const MOBILE_SHELF_PROJECTS = [
 /* Theme Configuration Dictionary */
 const THEME_CONFIG = {
   morning: { 
-    navRgb: '186, 230, 253', pageBg: 'bg-sky-50/95', textMain: 'text-slate-900', textMuted: 'text-slate-700', cardBg: 'bg-white', cardBorder: 'border-slate-200', footerBg: 'bg-slate-100', inputBg: 'bg-white', inputBorder: 'border-slate-300',
+    navRgb: '186, 230, 253', pageBg: 'bg-sky-50/55', textMain: 'text-slate-900', textMuted: 'text-slate-700', cardBg: 'bg-white', cardBorder: 'border-slate-200', footerBg: 'bg-slate-100', inputBg: 'bg-white', inputBorder: 'border-slate-300',
     navText: 'text-blue-900', accentText: 'text-blue-800', accentBg: 'bg-blue-800', accentHoverBg: 'hover:bg-blue-700', accentBorder: 'border-blue-800', accentHoverBorder: 'hover:border-blue-700', accentHoverText: 'hover:text-blue-700', accentLightBg: 'bg-blue-800/10', accentLightBorder: 'border-blue-800/20', selectionBg: 'selection:bg-blue-800'
   },
   afternoon: { 
-    navRgb: '255, 237, 213', pageBg: 'bg-orange-50/95', textMain: 'text-slate-900', textMuted: 'text-slate-700', cardBg: 'bg-white', cardBorder: 'border-slate-200', footerBg: 'bg-slate-100', inputBg: 'bg-white', inputBorder: 'border-slate-300',
+    navRgb: '255, 237, 213', pageBg: 'bg-orange-50/55', textMain: 'text-slate-900', textMuted: 'text-slate-700', cardBg: 'bg-white', cardBorder: 'border-slate-200', footerBg: 'bg-slate-100', inputBg: 'bg-white', inputBorder: 'border-slate-300',
     navText: 'text-amber-900', accentText: 'text-amber-800', accentBg: 'bg-amber-800', accentHoverBg: 'hover:bg-amber-700', accentBorder: 'border-amber-800', accentHoverBorder: 'hover:border-amber-700', accentHoverText: 'hover:text-amber-700', accentLightBg: 'bg-amber-800/10', accentLightBorder: 'border-amber-800/20', selectionBg: 'selection:bg-amber-800'
   },
   night: { 
-    navRgb: '15, 23, 42', pageBg: 'bg-slate-900/95', textMain: 'text-white', textMuted: 'text-slate-300', cardBg: 'bg-slate-900/60', cardBorder: 'border-slate-800/50', footerBg: 'bg-slate-900', inputBg: 'bg-slate-950', inputBorder: 'border-slate-800',
+    navRgb: '15, 23, 42', pageBg: 'bg-slate-900/55', textMain: 'text-white', textMuted: 'text-slate-300', cardBg: 'bg-slate-900/60', cardBorder: 'border-slate-800/50', footerBg: 'bg-slate-900', inputBg: 'bg-slate-950', inputBorder: 'border-slate-800',
     navText: 'text-white', accentText: 'text-green-500', accentBg: 'bg-green-500', accentHoverBg: 'hover:bg-green-400', accentBorder: 'border-green-500', accentHoverBorder: 'hover:border-green-400', accentHoverText: 'hover:text-green-400', accentLightBg: 'bg-green-500/10', accentLightBorder: 'border-green-500/20', selectionBg: 'selection:bg-green-500'
   }
 };
@@ -230,7 +230,36 @@ export default function PortfolioHub({ setIsChatOpen }) {
           <section id="about" className="py-32 px-6 max-w-4xl mx-auto text-center md:text-left">
             <h2 className={`text-4xl font-extrabold mb-6 ${currentTheme.textMain}`}>About <span className={currentTheme.accentText}>Me</span></h2>
             <div className={`h-1 w-20 rounded-full mb-10 mx-auto md:mx-0 ${currentTheme.accentBg}`}></div>
-            <p className={`text-xl leading-relaxed font-medium whitespace-pre-line ${currentTheme.textMuted}`}>{SITE_DATA.aboutMe}</p>
+            <p className={`text-xl leading-relaxed font-medium whitespace-pre-line mb-12 ${currentTheme.textMuted}`}>{SITE_DATA.aboutMe}</p>
+
+            {/* Structured Skills & Tools Matrix */}
+            <div className={`flex flex-col md:flex-row w-full rounded-3xl border ${currentTheme.accentLightBorder} bg-white/5 backdrop-blur-md shadow-sm overflow-hidden text-left`}>
+              
+              {/* Technical Skills - Left Side (Desktop) / Top (Mobile) */}
+              <div className={`flex-1 p-8 border-b md:border-b-0 md:border-r ${currentTheme.accentLightBorder}`}>
+                <h3 className={`text-xl font-extrabold mb-6 ${currentTheme.textMain}`}>Technical Skills</h3>
+                <div className="flex flex-wrap gap-2">
+                  {SITE_DATA.skills.map((skill, index) => (
+                    <span key={index} className={`px-3 py-1.5 text-sm font-bold rounded-xl ${currentTheme.accentLightBg} ${currentTheme.accentText} border ${currentTheme.accentLightBorder}`}>
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Core Tools - Right Side (Desktop) / Bottom (Mobile) */}
+              <div className="flex-1 p-8">
+                <h3 className={`text-xl font-extrabold mb-6 ${currentTheme.textMain}`}>Core Tools</h3>
+                <div className="flex flex-wrap gap-2">
+                  {SITE_DATA.tools.map((tool, index) => (
+                    <span key={index} className={`px-3 py-1.5 text-sm font-bold rounded-xl ${currentTheme.accentLightBg} ${currentTheme.accentText} border ${currentTheme.accentLightBorder}`}>
+                      {tool}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+            </div>
           </section>
 
           <section id="resume" className="py-12 px-6 max-w-4xl mx-auto">

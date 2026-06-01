@@ -1,6 +1,6 @@
 /* Imports and Dependencies */
 import React, { useState, useEffect, useRef } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiX, FiSend, FiMessageCircle } from 'react-icons/fi';
 import PortfolioHub from './PortfolioHub';
@@ -46,6 +46,9 @@ export default function App() {
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
   const optionsScrollRef = useRef(null); 
+  
+  /* Route Observer */
+  const location = useLocation();
 
   /* Lifecycle: System Time Initialization */
   useEffect(() => {
@@ -140,7 +143,12 @@ export default function App() {
     }
   };
 
+  /* Derived State Execution */
   const currentTheme = THEME_CONFIG[timeOfDay];
+  
+  // Forces the chat bubble to appear globally if a Case Study is active
+  const isCaseStudyPage = location.pathname.includes('/projects/');
+  const displayChatBubble = !isChatOpen && (hasOpenedChat || isCaseStudyPage);
 
   /* Render Output */
   return (
@@ -150,12 +158,12 @@ export default function App() {
         <Route path="/projects/:id" element={<CaseStudy />} />
       </Routes>
 
-      {!isChatOpen && hasOpenedChat && (
+      {displayChatBubble && (
         <motion.button
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           onClick={() => setIsChatOpen(true)}
-          className={`fixed bottom-6 right-6 md:bottom-8 md:right-8 p-4 rounded-full shadow-2xl z-[100] ${currentTheme.chatBg} border ${currentTheme.chatBorder} hover:scale-110 transition-transform`}
+          className={`fixed bottom-6 right-6 md:bottom-8 md:right-8 p-4 rounded-full shadow-2xl z-[999] ${currentTheme.chatBg} border ${currentTheme.chatBorder} hover:scale-110 transition-transform`}
         >
           <FiMessageCircle size={28} className={currentTheme.accentText} />
         </motion.button>
@@ -166,7 +174,7 @@ export default function App() {
           <motion.div 
             initial={{ opacity: 0, y: 50, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: 0.95 }}
             onMouseEnter={() => setIsChatHovered(true)} onMouseLeave={() => setIsChatHovered(false)}
-            className={`fixed bottom-0 right-0 md:bottom-8 md:right-8 w-full h-[100dvh] md:w-96 md:h-[550px] ${currentTheme.chatBg} backdrop-blur-2xl border ${currentTheme.chatBorder} rounded-none md:rounded-2xl shadow-2xl flex flex-col overflow-hidden z-[110]`}
+            className={`fixed bottom-0 right-0 md:bottom-8 md:right-8 w-full h-[100dvh] md:w-96 md:h-[550px] ${currentTheme.chatBg} backdrop-blur-2xl border ${currentTheme.chatBorder} rounded-none md:rounded-2xl shadow-2xl flex flex-col overflow-hidden z-[9999]`}
           >
             <div className={`flex justify-between items-center p-4 border-b ${currentTheme.chatBorder} ${currentTheme.chatHeaderBg}`}>
               <div className="flex items-center">
