@@ -6,9 +6,21 @@ import PortfolioHub from './PortfolioHub';
 import CaseStudy from './CaseStudy';
 
 const THEME_CONFIG = {
-  morning: { chatBg: 'bg-sky-50/95', chatHeaderBg: 'bg-sky-100/90', chatBorder: 'border-sky-200', chatTextMain: 'text-slate-900', npcMsgBg: 'bg-white', npcMsgBorder: 'border-sky-200', npcMsgText: 'text-slate-800' },
-  afternoon: { chatBg: 'bg-orange-50/95', chatHeaderBg: 'bg-orange-100/90', chatBorder: 'border-orange-200', chatTextMain: 'text-slate-900', npcMsgBg: 'bg-white', npcMsgBorder: 'border-orange-200', npcMsgText: 'text-slate-800' },
-  night: { chatBg: 'bg-slate-900/95', chatHeaderBg: 'bg-slate-800/80', chatBorder: 'border-slate-700/50', chatTextMain: 'text-white', npcMsgBg: 'bg-slate-800', npcMsgBorder: 'border-slate-700', npcMsgText: 'text-slate-200' }
+  morning: { 
+    chatBg: 'bg-sky-50/95', chatHeaderBg: 'bg-sky-100/90', chatBorder: 'border-sky-200', chatTextMain: 'text-slate-900', npcMsgBg: 'bg-white', npcMsgBorder: 'border-sky-200', npcMsgText: 'text-slate-800',
+    accentBg: 'bg-blue-800', accentHoverBg: 'hover:bg-blue-700', accentText: 'text-blue-800', accentHoverText: 'hover:text-blue-700', accentBorder: 'border-blue-800', 
+    btnLightBg: 'hover:bg-blue-100', btnLightBorder: 'hover:border-blue-300', disabledBg: 'disabled:bg-blue-800/50'
+  },
+  afternoon: { 
+    chatBg: 'bg-orange-50/95', chatHeaderBg: 'bg-orange-100/90', chatBorder: 'border-orange-200', chatTextMain: 'text-slate-900', npcMsgBg: 'bg-white', npcMsgBorder: 'border-orange-200', npcMsgText: 'text-slate-800',
+    accentBg: 'bg-amber-800', accentHoverBg: 'hover:bg-amber-700', accentText: 'text-amber-800', accentHoverText: 'hover:text-amber-700', accentBorder: 'border-amber-800', 
+    btnLightBg: 'hover:bg-amber-100', btnLightBorder: 'hover:border-amber-300', disabledBg: 'disabled:bg-amber-800/50'
+  },
+  night: { 
+    chatBg: 'bg-slate-900/95', chatHeaderBg: 'bg-slate-800/80', chatBorder: 'border-slate-700/50', chatTextMain: 'text-white', npcMsgBg: 'bg-slate-800', npcMsgBorder: 'border-slate-700', npcMsgText: 'text-slate-200',
+    accentBg: 'bg-green-500', accentHoverBg: 'hover:bg-green-400', accentText: 'text-green-500', accentHoverText: 'hover:text-green-400', accentBorder: 'border-green-500', 
+    btnLightBg: 'hover:bg-green-100', btnLightBorder: 'hover:border-green-300', disabledBg: 'disabled:bg-green-500/50'
+  }
 };
 
 const CHAT_OPTIONS = [
@@ -19,10 +31,8 @@ const CHAT_OPTIONS = [
 
 export default function App() {
   const [timeOfDay, setTimeOfDay] = useState('afternoon');
-  
-  // Global Chat State
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [hasOpenedChat, setHasOpenedChat] = useState(false); // Tracks if chat was opened at least once
+  const [hasOpenedChat, setHasOpenedChat] = useState(false); 
   const [isChatHovered, setIsChatHovered] = useState(false);
   const [chatHistory, setChatHistory] = useState([{ type: 'npc', text: "Hey there. Thanks for dropping by. What do you want to know?" }]);
   const [customInput, setCustomInput] = useState('');
@@ -30,7 +40,7 @@ export default function App() {
   
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
-  const optionsScrollRef = useRef(null);
+  const optionsScrollRef = useRef(null); 
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -39,19 +49,15 @@ export default function App() {
     else setTimeOfDay('night');
   }, []);
 
-  // URL PARAMETER LISTENER: Auto-opens chat if triggered from a specific link
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('openChat') === 'true') {
       setIsChatOpen(true);
-      setHasOpenedChat(true); // Ensures the bubble stays if they close it
-      
-      // Optional: Clean up the URL so it looks nice after opening
+      setHasOpenedChat(true); 
       window.history.replaceState({}, document.title, "/");
     }
   }, []);
 
-  // Track if chat has been opened for the persistent bubble
   useEffect(() => {
     if (isChatOpen) setHasOpenedChat(true);
   }, [isChatOpen]);
@@ -67,25 +73,20 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isChatOpen, isChatHovered]);
 
-  useEffect(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), [chatHistory]);
-
-  // 2. ADD THIS EFFECT TO BLOCK BACKGROUND SCROLLING
   useEffect(() => {
     const scrollEl = optionsScrollRef.current;
     if (!scrollEl) return;
-
     const handleWheel = (e) => {
       if (e.deltaY !== 0) {
-        e.preventDefault(); // Kills the main website vertical scroll
-        scrollEl.scrollLeft += e.deltaY; // Converts vertical wheel to horizontal
+        e.preventDefault(); 
+        scrollEl.scrollLeft += e.deltaY; 
       }
     };
-
-    // { passive: false } is the magic key that allows preventDefault to work
     scrollEl.addEventListener('wheel', handleWheel, { passive: false });
-
     return () => scrollEl.removeEventListener('wheel', handleWheel);
-  }, [isChatOpen]); // Re-attach whenever the chat box opens
+  }, [isChatOpen]);
+
+  useEffect(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), [chatHistory]);
 
   const handleAskQuestion = (qa) => {
     if (isTyping) return;
@@ -133,7 +134,6 @@ export default function App() {
         <Route path="/projects/:id" element={<CaseStudy />} />
       </Routes>
 
-      {/* Global Persistent Hover Bubble */}
       {!isChatOpen && hasOpenedChat && (
         <motion.button
           initial={{ scale: 0, opacity: 0 }}
@@ -141,11 +141,10 @@ export default function App() {
           onClick={() => setIsChatOpen(true)}
           className={`fixed bottom-8 right-8 p-4 rounded-full shadow-2xl z-[100] ${currentTheme.chatBg} border ${currentTheme.chatBorder} hover:scale-110 transition-transform`}
         >
-          <FiMessageCircle size={28} className={currentTheme.chatTextMain} />
+          <FiMessageCircle size={28} className={currentTheme.accentText} />
         </motion.button>
       )}
 
-      {/* Global Chat Interface */}
       <AnimatePresence>
         {isChatOpen && (
           <motion.div 
@@ -155,17 +154,16 @@ export default function App() {
           >
             <div className={`flex justify-between items-center p-4 border-b ${currentTheme.chatBorder} ${currentTheme.chatHeaderBg}`}>
               <div className="flex items-center">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse mr-2"></div>
+                <div className={`w-2 h-2 rounded-full ${currentTheme.accentBg} animate-pulse mr-2`}></div>
                 <span className={`font-medium ${currentTheme.chatTextMain}`}>Brintik</span>
               </div>
-              <button onClick={() => setIsChatOpen(false)} className={`${currentTheme.chatTextMain} hover:text-green-500 transition`}><FiX size={20} /></button>
+              <button onClick={() => setIsChatOpen(false)} className={`${currentTheme.chatTextMain} ${currentTheme.accentHoverText} transition`}><FiX size={20} /></button>
             </div>
             
-            {/* Added overscroll-contain to isolate scrolling */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 overscroll-contain">
               {chatHistory.map((msg, idx) => (
                 <div key={idx} className={`flex ${msg.type === 'player' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${msg.type === 'player' ? 'bg-green-500 text-white rounded-br-sm' : `${currentTheme.npcMsgBg} border ${currentTheme.npcMsgBorder} ${currentTheme.npcMsgText} rounded-bl-sm shadow-sm`}`}>
+                  <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${msg.type === 'player' ? `${currentTheme.accentBg} text-white rounded-br-sm` : `${currentTheme.npcMsgBg} border ${currentTheme.npcMsgBorder} ${currentTheme.npcMsgText} rounded-bl-sm shadow-sm`}`}>
                     {msg.text}
                   </div>
                 </div>
@@ -185,14 +183,14 @@ export default function App() {
             <div className={`p-3 ${currentTheme.chatHeaderBg} border-t ${currentTheme.chatBorder} flex flex-col gap-3`}>
               <div ref={optionsScrollRef} className="flex gap-2 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] cursor-grab active:cursor-grabbing">
                 {CHAT_OPTIONS.map((opt) => (
-                  <button key={opt.id} onClick={() => handleAskQuestion(opt)} disabled={isTyping} className={`whitespace-nowrap px-3 py-1.5 rounded-full border ${currentTheme.chatBorder} bg-white/50 text-slate-800 text-xs hover:bg-green-100 hover:border-green-300 transition shadow-sm disabled:opacity-50`}>
+                  <button key={opt.id} onClick={() => handleAskQuestion(opt)} disabled={isTyping} className={`whitespace-nowrap px-3 py-1.5 rounded-full border ${currentTheme.chatBorder} bg-white/50 text-slate-800 text-xs ${currentTheme.btnLightBg} ${currentTheme.btnLightBorder} transition shadow-sm disabled:opacity-50`}>
                     {opt.question}
                   </button>
                 ))}
               </div>
               <form onSubmit={handleCustomSubmit} className="flex gap-2">
-                <input ref={inputRef} type="text" value={customInput} onChange={(e) => setCustomInput(e.target.value)} disabled={isTyping} placeholder="Press Enter to type..." className={`flex-1 px-3 py-2 rounded-lg text-sm bg-white/60 border ${currentTheme.chatBorder} text-slate-900 focus:outline-none focus:border-green-500 transition disabled:opacity-50`} />
-                <button type="submit" disabled={isTyping || !customInput.trim()} className="bg-green-500 hover:bg-green-400 text-white p-2 rounded-lg transition disabled:opacity-50 disabled:bg-green-500/50 flex items-center justify-center"><FiSend size={16} /></button>
+                <input ref={inputRef} type="text" value={customInput} onChange={(e) => setCustomInput(e.target.value)} disabled={isTyping} placeholder="Press Enter to type..." className={`flex-1 px-3 py-2 rounded-lg text-sm bg-white/60 border ${currentTheme.chatBorder} text-slate-900 focus:outline-none focus:border-transparent focus:ring-1 focus:ring-[${currentTheme.accentBorder}] transition disabled:opacity-50`} />
+                <button type="submit" disabled={isTyping || !customInput.trim()} className={`${currentTheme.accentBg} ${currentTheme.accentHoverBg} text-white p-2 rounded-lg transition disabled:opacity-50 ${currentTheme.disabledBg} flex items-center justify-center`}><FiSend size={16} /></button>
               </form>
             </div>
           </motion.div>
