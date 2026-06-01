@@ -164,7 +164,7 @@ It processes raw images through a custom YOLOv8 neural network and maps the coor
       title: "Personalized chat-bot",
       shortDesc: `A context-aware digital chatbot running on LLaMA 3.1 via Groq's LPU infrastructure. Features continuous state history mapping to eradicate LLM memory amnesia, webkit scroll-hidden horizontal quick-replies, and a highly calibrated system-lore injection layer that handles recruiter Q&As with sharp, unbothered sarcasm.`,
       image: "/data/projects/ChatBot.png",
-      websiteUrl: "https://your-live-app.com",
+      websiteUrl: "https://portfolio-website-mocha-one.vercel.app/?openChat=true",
       readMoreUrl: "/projects/project-13",
       tags: ["Groq API", "LLaMA 3.1", "React Engine", "Context Injection", "State Mapping", "Tailwind CSS", "Vercel CDN"],
 
