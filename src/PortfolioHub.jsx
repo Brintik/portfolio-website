@@ -1,52 +1,34 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FiX, FiArrowUp, FiGithub, FiLinkedin, FiMail, FiExternalLink, FiArrowRight, FiMapPin, FiDownload, FiSend } from 'react-icons/fi';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { FiArrowUp, FiGithub, FiLinkedin, FiMail, FiExternalLink, FiArrowRight, FiMapPin, FiDownload } from 'react-icons/fi';
 import { SiKaggle } from 'react-icons/si';
 import { useNavigate } from 'react-router-dom';
-
-// IMPORT YOUR NEW DATA FILE HERE
 import { SITE_DATA } from './portfolioData';
 
 const DEBUG_MODE = false; 
 
 const CHARACTER_POSITIONS = {
-  morning: { top: '30%', left: '67%', width: '10%', height: '40%' }, 
-  afternoon: { top: '24%', left: '70%', width: '9%', height: '52%' }, 
-  night: { top: '40%', left: '52%', width: '10%', height: '36%' }      
+  morning: { top: '33%', left: '67%', width: '10%', height: '35%' }, 
+  afternoon: { top: '27.5%', left: '70%', width: '9%', height: '44%' }, 
+  night: { top: '42.5%', left: '52%', width: '9%', height: '30%' }      
 };
 
 const SHELF_PROJECTS = [
-  { id: 11, name: "AI Image Recognizer", top: '21%', left: '10%', width: '4.5%', height: '14%', targetId: 'project-11' },
-  { id: 12, name: "Model Ship Project", top: '22%', left: '17.5%', width: '3.4%', height: '14%', targetId: 'project-12' },
-  { id: 13, name: "Plant Pot App", top: '25%', left: '27.5%', width: '5%', height: '12%', targetId: 'project-13' },
+  { id: 11, name: "AI Image Recognizer", top: '23.5%', left: '9.8%', width: '4.5%', height: '14%', targetId: 'project-11' },
+  { id: 12, name: "Model Ship Project", top: '25.2%', left: '17%', width: '4%', height: '13%', targetId: 'project-12' },
+  { id: 13, name: "Plant Pot App", top: '27.5%', left: '27.5%', width: '5%', height: '12%', targetId: 'project-13' },
 ];
 
 const THEME_CONFIG = {
-  morning: { navRgb: '186, 230, 253', pageBg: 'bg-slate-50/50', textMain: 'text-slate-900', textMuted: 'text-slate-700', cardBg: 'bg-white', cardBorder: 'border-slate-200', footerBg: 'bg-slate-100', inputBg: 'bg-white', inputBorder: 'border-slate-300', chatBg: 'bg-sky-50/95', chatHeaderBg: 'bg-sky-100/90', chatBorder: 'border-sky-200', chatTextMain: 'text-slate-900', npcMsgBg: 'bg-white', npcMsgBorder: 'border-sky-200', npcMsgText: 'text-slate-800' },
-  afternoon: { navRgb: '255, 237, 213', pageBg: 'bg-slate-50/50', textMain: 'text-slate-900', textMuted: 'text-slate-700', cardBg: 'bg-white', cardBorder: 'border-slate-200', footerBg: 'bg-slate-100', inputBg: 'bg-white', inputBorder: 'border-slate-300', chatBg: 'bg-orange-50/95', chatHeaderBg: 'bg-orange-100/90', chatBorder: 'border-orange-200', chatTextMain: 'text-slate-900', npcMsgBg: 'bg-white', npcMsgBorder: 'border-orange-200', npcMsgText: 'text-slate-800' },
-  night: { navRgb: '15, 23, 42', pageBg: 'bg-slate-950/50', textMain: 'text-white', textMuted: 'text-slate-300', cardBg: 'bg-slate-900/60', cardBorder: 'border-slate-800/50', footerBg: 'bg-slate-900', inputBg: 'bg-slate-950', inputBorder: 'border-slate-800', chatBg: 'bg-slate-900/95', chatHeaderBg: 'bg-slate-800/80', chatBorder: 'border-slate-700/50', chatTextMain: 'text-white', npcMsgBg: 'bg-slate-800', npcMsgBorder: 'border-slate-700', npcMsgText: 'text-slate-200' }
+  morning: { navRgb: '186, 230, 253', pageBg: 'bg-slate-50/50', textMain: 'text-slate-900', textMuted: 'text-slate-700', cardBg: 'bg-white', cardBorder: 'border-slate-200', footerBg: 'bg-slate-100', inputBg: 'bg-white', inputBorder: 'border-slate-300' },
+  afternoon: { navRgb: '255, 237, 213', pageBg: 'bg-slate-50/50', textMain: 'text-slate-900', textMuted: 'text-slate-700', cardBg: 'bg-white', cardBorder: 'border-slate-200', footerBg: 'bg-slate-100', inputBg: 'bg-white', inputBorder: 'border-slate-300' },
+  night: { navRgb: '15, 23, 42', pageBg: 'bg-slate-950/50', textMain: 'text-white', textMuted: 'text-slate-300', cardBg: 'bg-slate-900/60', cardBorder: 'border-slate-800/50', footerBg: 'bg-slate-900', inputBg: 'bg-slate-950', inputBorder: 'border-slate-800' }
 };
 
-const CHAT_OPTIONS = [
-  { id: 1, question: "Tell me about yourself.", answer: "I'm Brintik, a self-taught AI & ML whiz, coding since I stumbled upon Python in 1st undergrad year. My passion lies at the intersection of math, logic, and data. When I'm not automating code, I game, eat spicy butter chicken, and binge-watch anime." },
-  { id: 2, question: "What is your main tech stack?", answer: "Python all the way, specifically YOLOv8, PyTorch, Pandas, and Scikit-learn for my AI & ML work. React, Tailwind, and Framer Motion on the frontend. Python, FastAPI, Docker, and YOLOv8 on the backend! Java? Never heard of her. Seeing someone named JavaScript though!" },
-  { id: 3, question: "Are you open to new work?", answer: "Yeah, I'm actively looking for a new challenge, whether it's a full-time remote or hybrid AI/ML role, or some freelance automation projects. Hit the email form and we can set something up." }
-];
-
-export default function PortfolioHub() {
+export default function PortfolioHub({ setIsChatOpen }) {
   const [timeOfDay, setTimeOfDay] = useState('afternoon');
   const [bgLoaded, setBgLoaded] = useState(false);
-  
-  // Chat State
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isChatHovered, setIsChatHovered] = useState(false);
-  const [chatHistory, setChatHistory] = useState([{ type: 'npc', text: "Hey there. Thanks for dropping by. What do you want to know?" }]);
-  const [customInput, setCustomInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  
   const navigate = useNavigate();
-  const chatEndRef = useRef(null);
-  const inputRef = useRef(null);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -55,18 +37,19 @@ export default function PortfolioHub() {
     else setTimeOfDay('night');
   }, []);
 
+  // SCROLL MEMORY LOGIC
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Enter' && isChatOpen && isChatHovered && document.activeElement !== inputRef.current) {
-        e.preventDefault();
-        inputRef.current?.focus();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isChatOpen, isChatHovered]);
+    const savedScrollPos = sessionStorage.getItem('portfolioScrollPos');
+    if (savedScrollPos) {
+      window.scrollTo({ top: parseInt(savedScrollPos, 10), behavior: 'instant' });
+      sessionStorage.removeItem('portfolioScrollPos');
+    }
+  }, []);
 
-  useEffect(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), [chatHistory]);
+  const handleProjectNavigation = (url) => {
+    sessionStorage.setItem('portfolioScrollPos', window.scrollY);
+    navigate(url);
+  };
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
   const scrollToSection = (id) => {
@@ -74,43 +57,6 @@ export default function PortfolioHub() {
     if (element) {
       const y = element.getBoundingClientRect().top + window.scrollY - 80;
       window.scrollTo({ top: y, behavior: 'smooth' });
-    }
-  };
-
-  const handleAskQuestion = (qa) => {
-    if (isTyping) return;
-    setChatHistory(prev => [...prev, { type: 'player', text: qa.question }]);
-    setIsTyping(true);
-    setTimeout(() => {
-      setChatHistory(prev => [...prev, { type: 'npc', text: qa.answer }]);
-      setIsTyping(false);
-    }, 600);
-  };
-
-  const handleCustomSubmit = async (e) => {
-    e.preventDefault();
-    if (!customInput.trim() || isTyping) return;
-    const userMessage = customInput.trim();
-    setChatHistory(prev => [...prev, { type: 'player', text: userMessage }]);
-    setCustomInput('');
-    setIsTyping(true);
-
-    try {
-      const apiHistory = chatHistory.map(msg => ({ role: msg.type === 'player' ? 'user' : 'assistant', content: msg.text }));
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${import.meta.env.VITE_GROQ_API_KEY}` },
-        body: JSON.stringify({
-          model: 'llama-3.1-8b-instant', 
-          messages: [{ role: 'system', content: import.meta.env.VITE_AI_LORE }, ...apiHistory, { role: 'user', content: userMessage }]
-        })
-      });
-      const data = await response.json();
-      setChatHistory(prev => [...prev, { type: 'npc', text: data.choices[0].message.content }]);
-    } catch (error) {
-      setChatHistory(prev => [...prev, { type: 'npc', text: "Looks like my API connection is taking a nap. Use the email form below!" }]);
-    } finally {
-      setIsTyping(false);
     }
   };
 
@@ -135,43 +81,52 @@ export default function PortfolioHub() {
         </div>
       </nav>
 
-      <div className="fixed inset-0 w-full h-full z-0 bg-slate-900">
-        <motion.img 
-          src={`/${timeOfDay}.png`} 
-          alt="Room" 
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: bgLoaded ? 1 : 0 }} 
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          onLoad={() => setBgLoaded(true)}
-          className="w-full h-full object-cover" 
-        />
+      {/* 1. Add overflow-hidden to the main wrapper to hide the cropped container edges */}
+      <div className="fixed inset-0 w-full h-full z-0 bg-slate-900 overflow-hidden">
         
-        {bgLoaded && (
-          <div className="absolute inset-0 pt-16 z-10">
-            <div onClick={() => setIsChatOpen(true)} className={`absolute cursor-pointer group ${DEBUG_MODE ? 'bg-red-500/50' : ''}`} style={CHARACTER_POSITIONS[timeOfDay]}>
-              {!isChatOpen && (
+        {/* 2. THE MAGIC SCALER CONTAINER: 
+            This div is forced to a perfect 16:9 ratio. 
+            The math (56.25vw and 177.77vh) mimics object-cover behavior on a layout level! 
+        */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100vw] h-[56.25vw] min-h-[100vh] min-w-[177.77vh]">
+          
+          <motion.img 
+            src={`/${timeOfDay}.png`} 
+            alt="Room" 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: bgLoaded ? 1 : 0 }} 
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            onLoad={() => setBgLoaded(true)}
+            className="w-full h-full object-cover" 
+          />
+          
+          {bgLoaded && (
+            <div className="absolute inset-0 pt-16 z-10">
+              {/* The Character Hotspot */}
+              <div onClick={() => setIsChatOpen(true)} className={`absolute cursor-pointer group ${DEBUG_MODE ? 'bg-red-500/50' : ''}`} style={CHARACTER_POSITIONS[timeOfDay]}>
                 <motion.div onClick={(e) => { e.stopPropagation(); setIsChatOpen(true); }} animate={{ y: [0, -8, 0] }} transition={{ repeat: Infinity, duration: 2.5 }} className="absolute -top-16 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm text-slate-900 font-extrabold text-sm px-4 py-2 rounded-2xl border-2 border-slate-900 shadow-[4px_4px_0_0_rgba(15,23,42,1)] hover:scale-110 transition-transform whitespace-nowrap pointer-events-auto">
                   Hey. Wanna chat?
                   <div className="absolute -bottom-[8px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-slate-900"></div>
                 </motion.div>
-              )}
-            </div>
-
-            {SHELF_PROJECTS.map((project) => (
-              <div key={project.id} onClick={() => scrollToSection(project.targetId)} className={`absolute cursor-pointer group flex items-center justify-center ${DEBUG_MODE ? 'bg-blue-500/50' : ''}`} style={{ top: project.top, left: project.left, width: project.width, height: project.height }}>
-                <div className="absolute w-full h-full group-hover:scale-90 transition-transform duration-300">
-                  <div className="absolute top-0 left-0 w-4 h-4 border-t-[3px] border-l-[3px] border-white/50 group-hover:border-green-400" />
-                  <div className="absolute top-0 right-0 w-4 h-4 border-t-[3px] border-r-[3px] border-white/50 group-hover:border-green-400" />
-                  <div className="absolute bottom-0 left-0 w-4 h-4 border-b-[3px] border-l-[3px] border-white/50 group-hover:border-green-400" />
-                  <div className="absolute bottom-0 right-0 w-4 h-4 border-b-[3px] border-r-[3px] border-white/50 group-hover:border-green-400" />
-                </div>
-                <motion.div initial={{ opacity: 0, y: 10 }} whileHover={{ opacity: 1, y: 0 }} className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white font-bold text-xs px-3 py-1.5 rounded-md whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 z-20 border border-slate-700">
-                  {project.name}
-                </motion.div>
               </div>
-            ))}
-          </div>
-        )}
+
+              {/* The Project Shelf Hitboxes */}
+              {SHELF_PROJECTS.map((project) => (
+                <div key={project.id} onClick={() => scrollToSection(project.targetId)} className={`absolute cursor-pointer group flex items-center justify-center ${DEBUG_MODE ? 'bg-blue-500/50' : ''}`} style={{ top: project.top, left: project.left, width: project.width, height: project.height }}>
+                  <div className="absolute w-full h-full group-hover:scale-90 transition-transform duration-300">
+                    <div className="absolute top-0 left-0 w-4 h-4 border-t-[3px] border-l-[3px] border-white/50 group-hover:border-green-400" />
+                    <div className="absolute top-0 right-0 w-4 h-4 border-t-[3px] border-r-[3px] border-white/50 group-hover:border-green-400" />
+                    <div className="absolute bottom-0 left-0 w-4 h-4 border-b-[3px] border-l-[3px] border-white/50 group-hover:border-green-400" />
+                    <div className="absolute bottom-0 right-0 w-4 h-4 border-b-[3px] border-r-[3px] border-white/50 group-hover:border-green-400" />
+                  </div>
+                  <motion.div initial={{ opacity: 0, y: 10 }} whileHover={{ opacity: 1, y: 0 }} className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white font-bold text-xs px-3 py-1.5 rounded-md whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 z-20 border border-slate-700">
+                    {project.name}
+                  </motion.div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="relative z-10 w-full flex flex-col pointer-events-none">
@@ -182,7 +137,6 @@ export default function PortfolioHub() {
           <section id="about" className="py-32 px-6 max-w-4xl mx-auto text-center md:text-left">
             <h2 className={`text-4xl font-extrabold mb-6 ${currentTheme.textMain}`}>About <span className="text-green-500">Me</span></h2>
             <div className="h-1 w-20 bg-green-500 rounded-full mb-10 mx-auto md:mx-0"></div>
-            {/* Added whitespace-pre-line so it renders your paragraphs correctly! */}
             <p className={`text-xl leading-relaxed font-medium whitespace-pre-line ${currentTheme.textMuted}`}>{SITE_DATA.aboutMe}</p>
           </section>
 
@@ -202,17 +156,15 @@ export default function PortfolioHub() {
             <h2 className={`text-4xl font-extrabold mb-6 ${currentTheme.textMain}`}>Selected <span className="text-green-500">Works</span></h2>
             <div className="space-y-16 mt-16">
               {SITE_DATA.projects.map((proj) => (
-                <div key={proj.id} id={proj.id} onClick={() => navigate(proj.readMoreUrl)} className={`group flex flex-col md:flex-row ${currentTheme.cardBg} border ${currentTheme.cardBorder} rounded-2xl overflow-hidden hover:border-green-500 transition-all cursor-pointer shadow-xl`}>
+                <div key={proj.id} id={proj.id} onClick={() => handleProjectNavigation(proj.readMoreUrl)} className={`group flex flex-col md:flex-row ${currentTheme.cardBg} border ${currentTheme.cardBorder} rounded-2xl overflow-hidden hover:border-green-500 transition-all cursor-pointer shadow-xl`}>
                   <div className="w-full md:w-5/12 h-64 md:h-auto relative overflow-hidden bg-slate-900">
                     <img src={proj.image} alt={proj.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100" />
                   </div>
                   <div className="w-full md:w-7/12 p-8 md:p-12 flex flex-col justify-center">
                     <h3 className={`text-3xl font-bold mb-4 group-hover:text-green-500 transition-colors ${currentTheme.textMain}`}>{proj.title}</h3>
                     
-                    {/* Added whitespace-pre-line so it renders your paragraphs correctly! */}
                     <p className={`leading-relaxed mb-6 whitespace-pre-line ${currentTheme.textMuted}`}>{proj.shortDesc}</p>
                     
-                    {/* NEW TAGS SECTION */}
                     {proj.tags && (
                       <div className="flex flex-wrap gap-2 mb-8">
                         {proj.tags.map((tag, i) => (
@@ -224,9 +176,20 @@ export default function PortfolioHub() {
                     )}
                     
                     <div className="flex items-center gap-6 mt-auto">
-                      <a href={proj.websiteUrl} onClick={(e) => e.stopPropagation()} target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg border ${currentTheme.cardBorder} hover:border-green-500 text-green-500 transition`}>
-                        <FiExternalLink /> Live Site
-                      </a>
+                      {/* DUAL LINK INTERCEPTION */}
+                      <a href={proj.websiteUrl} onClick={(e) => {
+                        e.stopPropagation();
+                        // Make sure 'project-13' matches your chatbot project ID!
+                        if (proj.id === 'project-13') {
+                          e.preventDefault();
+                          // This opens the separate site if you have one
+                          window.open(proj.websiteUrl, '_blank'); 
+                          // This opens your portfolio in a new tab AND triggers the chat param
+                          window.open('https://portfolio-website-mocha-one.vercel.app/?openChat=true', '_blank');
+                        }
+                      }} target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg border ${currentTheme.cardBorder} hover:border-green-500 text-green-500 transition`}>
+                      <FiExternalLink /> Live Site
+                    </a>
                       <span className="flex items-center gap-2 text-sm font-bold text-green-500 group-hover:translate-x-2 transition-transform">
                         Read Case Study <FiArrowRight />
                       </span>
@@ -270,65 +233,12 @@ export default function PortfolioHub() {
               </div>
             </div>
           </footer>
-
         </div>
       </div>
 
       <button onClick={scrollToTop} className={`fixed bottom-8 left-8 p-3 rounded-full ${currentTheme.cardBg} backdrop-blur-md border ${currentTheme.cardBorder} ${currentTheme.textMuted} hover:${currentTheme.textMain} hover:border-green-500 transition-all z-[60] shadow-lg group`}>
         <FiArrowUp size={20} className="group-hover:-translate-y-1 transition-transform" />
       </button>
-
-      <AnimatePresence>
-        {isChatOpen && (
-          <motion.div 
-            initial={{ opacity: 0, y: 50, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            onMouseEnter={() => setIsChatHovered(true)} onMouseLeave={() => setIsChatHovered(false)}
-            className={`fixed bottom-8 right-8 w-96 h-[550px] ${currentTheme.chatBg} backdrop-blur-2xl border ${currentTheme.chatBorder} rounded-2xl shadow-2xl flex flex-col overflow-hidden z-[100]`}
-          >
-            <div className={`flex justify-between items-center p-4 border-b ${currentTheme.chatBorder} ${currentTheme.chatHeaderBg}`}>
-              <div className="flex items-center">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse mr-2"></div>
-                <span className={`font-medium ${currentTheme.chatTextMain}`}>Brintik</span>
-              </div>
-              <button onClick={() => setIsChatOpen(false)} className={`${currentTheme.chatTextMain} hover:text-green-500 transition`}><FiX size={20} /></button>
-            </div>
-            
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {chatHistory.map((msg, idx) => (
-                <div key={idx} className={`flex ${msg.type === 'player' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${msg.type === 'player' ? 'bg-green-500 text-white rounded-br-sm' : `${currentTheme.npcMsgBg} border ${currentTheme.npcMsgBorder} ${currentTheme.npcMsgText} rounded-bl-sm shadow-sm`}`}>
-                    {msg.text}
-                  </div>
-                </div>
-              ))}
-              {isTyping && (
-                <div className="flex justify-start">
-                  <div className={`p-3 rounded-2xl text-sm ${currentTheme.npcMsgBg} border ${currentTheme.npcMsgBorder} flex gap-1 items-center`}>
-                    <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></div>
-                    <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-75"></div>
-                    <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-150"></div>
-                  </div>
-                </div>
-              )}
-              <div ref={chatEndRef} />
-            </div>
-            
-            <div className={`p-3 ${currentTheme.chatHeaderBg} border-t ${currentTheme.chatBorder} flex flex-col gap-3`}>
-              <div onWheel={(e) => e.currentTarget.scrollLeft += e.deltaY} className="flex gap-2 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] cursor-grab active:cursor-grabbing">
-                {CHAT_OPTIONS.map((opt) => (
-                  <button key={opt.id} onClick={() => handleAskQuestion(opt)} disabled={isTyping} className={`whitespace-nowrap px-3 py-1.5 rounded-full border ${currentTheme.chatBorder} bg-white/50 text-slate-800 text-xs hover:bg-green-100 hover:border-green-300 transition shadow-sm disabled:opacity-50`}>
-                    {opt.question}
-                  </button>
-                ))}
-              </div>
-              <form onSubmit={handleCustomSubmit} className="flex gap-2">
-                <input ref={inputRef} type="text" value={customInput} onChange={(e) => setCustomInput(e.target.value)} disabled={isTyping} placeholder="Press Enter to type..." className={`flex-1 px-3 py-2 rounded-lg text-sm bg-white/60 border ${currentTheme.chatBorder} text-slate-900 focus:outline-none focus:border-green-500 transition disabled:opacity-50`} />
-                <button type="submit" disabled={isTyping || !customInput.trim()} className="bg-green-500 hover:bg-green-400 text-white p-2 rounded-lg transition disabled:opacity-50 disabled:bg-green-500/50 flex items-center justify-center"><FiSend size={16} /></button>
-              </form>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
