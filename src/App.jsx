@@ -1,3 +1,4 @@
+/* Imports and Dependencies */
 import React, { useState, useEffect, useRef } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -5,6 +6,7 @@ import { FiX, FiSend, FiMessageCircle } from 'react-icons/fi';
 import PortfolioHub from './PortfolioHub';
 import CaseStudy from './CaseStudy';
 
+/* Configuration Dictionaries */
 const THEME_CONFIG = {
   morning: { 
     chatBg: 'bg-sky-50/95', chatHeaderBg: 'bg-sky-100/90', chatBorder: 'border-sky-200', chatTextMain: 'text-slate-900', npcMsgBg: 'bg-white', npcMsgBorder: 'border-sky-200', npcMsgText: 'text-slate-800',
@@ -29,7 +31,9 @@ const CHAT_OPTIONS = [
   { id: 3, question: "Are you open to new work?", answer: "Yeah, I'm actively looking for a new challenge, whether it's a full-time remote or hybrid AI/ML role, or some freelance automation projects. Hit the email form and we can set something up." }
 ];
 
+/* Main Application Component */
 export default function App() {
+  /* Application State */
   const [timeOfDay, setTimeOfDay] = useState('afternoon');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [hasOpenedChat, setHasOpenedChat] = useState(false); 
@@ -38,10 +42,12 @@ export default function App() {
   const [customInput, setCustomInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   
+  /* DOM Element References */
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
   const optionsScrollRef = useRef(null); 
 
+  /* Lifecycle: System Time Initialization */
   useEffect(() => {
     const hour = new Date().getHours();
     if (hour >= 6 && hour < 12) setTimeOfDay('morning');
@@ -49,6 +55,7 @@ export default function App() {
     else setTimeOfDay('night');
   }, []);
 
+  /* Lifecycle: URL Parameter Routing */
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('openChat') === 'true') {
@@ -58,10 +65,12 @@ export default function App() {
     }
   }, []);
 
+  /* Lifecycle: Chat Session Tracking */
   useEffect(() => {
     if (isChatOpen) setHasOpenedChat(true);
   }, [isChatOpen]);
 
+  /* Lifecycle: Keyboard Event Listeners */
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Enter' && isChatOpen && isChatHovered && document.activeElement !== inputRef.current) {
@@ -73,6 +82,7 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isChatOpen, isChatHovered]);
 
+  /* Lifecycle: Horizontal Scroll Interceptor */
   useEffect(() => {
     const scrollEl = optionsScrollRef.current;
     if (!scrollEl) return;
@@ -86,8 +96,12 @@ export default function App() {
     return () => scrollEl.removeEventListener('wheel', handleWheel);
   }, [isChatOpen]);
 
-  useEffect(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), [chatHistory]);
+  /* Lifecycle: Chat Container Auto-Scroll */
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatHistory]);
 
+  /* Handlers: Pre-configured Input Processing */
   const handleAskQuestion = (qa) => {
     if (isTyping) return;
     setChatHistory(prev => [...prev, { type: 'player', text: qa.question }]);
@@ -98,6 +112,7 @@ export default function App() {
     }, 600);
   };
 
+  /* Handlers: LLM API Integration */
   const handleCustomSubmit = async (e) => {
     e.preventDefault();
     if (!customInput.trim() || isTyping) return;
@@ -119,7 +134,7 @@ export default function App() {
       const data = await response.json();
       setChatHistory(prev => [...prev, { type: 'npc', text: data.choices[0].message.content }]);
     } catch (error) {
-      setChatHistory(prev => [...prev, { type: 'npc', text: "Looks like my API connection is taking a nap. Use the email form below!" }]);
+      setChatHistory(prev => [...prev, { type: 'npc', text: "Connection anomaly detected. Please use the contact form below." }]);
     } finally {
       setIsTyping(false);
     }
@@ -127,6 +142,7 @@ export default function App() {
 
   const currentTheme = THEME_CONFIG[timeOfDay];
 
+  /* Render Output */
   return (
     <>
       <Routes>
@@ -139,7 +155,7 @@ export default function App() {
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           onClick={() => setIsChatOpen(true)}
-          className={`fixed bottom-8 right-8 p-4 rounded-full shadow-2xl z-[100] ${currentTheme.chatBg} border ${currentTheme.chatBorder} hover:scale-110 transition-transform`}
+          className={`fixed bottom-6 right-6 md:bottom-8 md:right-8 p-4 rounded-full shadow-2xl z-[100] ${currentTheme.chatBg} border ${currentTheme.chatBorder} hover:scale-110 transition-transform`}
         >
           <FiMessageCircle size={28} className={currentTheme.accentText} />
         </motion.button>
@@ -150,14 +166,14 @@ export default function App() {
           <motion.div 
             initial={{ opacity: 0, y: 50, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: 0.95 }}
             onMouseEnter={() => setIsChatHovered(true)} onMouseLeave={() => setIsChatHovered(false)}
-            className={`fixed bottom-8 right-8 w-96 h-[550px] ${currentTheme.chatBg} backdrop-blur-2xl border ${currentTheme.chatBorder} rounded-2xl shadow-2xl flex flex-col overflow-hidden z-[100]`}
+            className={`fixed bottom-0 right-0 md:bottom-8 md:right-8 w-full h-[100dvh] md:w-96 md:h-[550px] ${currentTheme.chatBg} backdrop-blur-2xl border ${currentTheme.chatBorder} rounded-none md:rounded-2xl shadow-2xl flex flex-col overflow-hidden z-[110]`}
           >
             <div className={`flex justify-between items-center p-4 border-b ${currentTheme.chatBorder} ${currentTheme.chatHeaderBg}`}>
               <div className="flex items-center">
                 <div className={`w-2 h-2 rounded-full ${currentTheme.accentBg} animate-pulse mr-2`}></div>
                 <span className={`font-medium ${currentTheme.chatTextMain}`}>Brintik</span>
               </div>
-              <button onClick={() => setIsChatOpen(false)} className={`${currentTheme.chatTextMain} ${currentTheme.accentHoverText} transition`}><FiX size={20} /></button>
+              <button onClick={() => setIsChatOpen(false)} className={`${currentTheme.chatTextMain} ${currentTheme.accentHoverText} transition p-2`}><FiX size={24} /></button>
             </div>
             
             <div className="flex-1 overflow-y-auto p-4 space-y-4 overscroll-contain">
@@ -180,7 +196,7 @@ export default function App() {
               <div ref={chatEndRef} />
             </div>
             
-            <div className={`p-3 ${currentTheme.chatHeaderBg} border-t ${currentTheme.chatBorder} flex flex-col gap-3`}>
+            <div className={`p-3 ${currentTheme.chatHeaderBg} border-t ${currentTheme.chatBorder} flex flex-col gap-3 pb-8 md:pb-3`}>
               <div ref={optionsScrollRef} className="flex gap-2 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] cursor-grab active:cursor-grabbing">
                 {CHAT_OPTIONS.map((opt) => (
                   <button key={opt.id} onClick={() => handleAskQuestion(opt)} disabled={isTyping} className={`whitespace-nowrap px-3 py-1.5 rounded-full border ${currentTheme.chatBorder} bg-white/50 text-slate-800 text-xs ${currentTheme.btnLightBg} ${currentTheme.btnLightBorder} transition shadow-sm disabled:opacity-50`}>
