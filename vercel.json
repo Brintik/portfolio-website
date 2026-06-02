@@ -4,7 +4,7 @@
   ],
   "headers": [
     {
-      "source": "/public/data/resume.pdf",
+      "source": "/public/data/resume_v1.pdf",
       "headers": [
         {
           "key": "Cache-Control",

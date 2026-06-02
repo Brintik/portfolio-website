@@ -13,7 +13,7 @@ export const SITE_DATA = {
     linkedin: "https://www.linkedin.com/in/brintikmajumder/",
     kaggle: "https://www.kaggle.com/brintikmajumder",
     email: "brintikmajumder@gmail.com",
-    resume: "/data/resume.pdf"
+    resume: "/data/resume_v1.pdf"
   },
 
   projects: [
