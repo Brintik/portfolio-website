@@ -7,9 +7,6 @@ import PortfolioHub from './PortfolioHub';
 import CaseStudy from './CaseStudy';
 import posthog from 'posthog-js'
 
-posthog.init('<YOUR_PROJECT_API_KEY>', { 
-  api_host: 'https://app.posthog.com' 
-})
 
 /* Configuration Dictionaries */
 const THEME_CONFIG = {
