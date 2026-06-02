@@ -31,8 +31,8 @@ const MOBILE_CHARACTER_POSITIONS = {
 
 const MOBILE_SHELF_PROJECTS = [
   { id: 11, name: "AI Image Recognizer", top: '35%', left: '0%', width: '8%', height: '9%', targetId: 'project-11' },
-  { id: 12, name: "Model Ship Project", top: '36%', left: '9.2%', width: '6.5%', height: '8%', targetId: 'project-12' },
-  { id: 13, name: "Plant Pot App", top: '36.5%', left: '20%', width: '12%', height: '8%', targetId: 'project-13' },
+  { id: 12, name: "Model Ship Project", top: '36%', left: '9.2%', width: '8%', height: '8%', targetId: 'project-12' },
+  { id: 13, name: "Plant Pot App", top: '36.5%', left: '22%', width: '10%', height: '8%', targetId: 'project-13' },
 ];
 
 /* Theme Configuration Dictionary */
